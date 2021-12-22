@@ -3,6 +3,7 @@ import axios from 'axios'
 import React from 'react';
 import {Helmet} from 'react-helmet'
 import { WithContext as ReactTags } from 'react-tag-input';
+import EditorCanvas from './EditorCanvas';
 
 const KeyCodes = {
   comma: 188,
@@ -18,7 +19,8 @@ class RoomEditor extends React.Component {
             title: '',
             description: '',
             tags: [],
-            roomJson: ''}
+            uniqueRoom: false,
+            roomJson: null}
 
         this.handleDelete = this.handleDelete.bind(this);
         this.handleAddition = this.handleAddition.bind(this);
@@ -33,10 +35,11 @@ class RoomEditor extends React.Component {
             axios
                 .get('http://localhost:4001/rooms/get/'+this.props.roomId)
                 .then(response => {
-                    console.log(response);
+                    console.log("DATA LOADED FROM DB: " + response.data[0].roomJson);
                     this.setState({room : response.data[0],
                         title: response.data[0].title,
                         description: response.data[0].description,
+                        uniqueRoom: response.data[0].uniqueRoom,
                         roomJson : response.data[0].roomJson});
                     try{
                         this.setState({tags: response.data[0].tags == null ? [] : JSON.parse(response.data[0].tags)});
@@ -46,8 +49,9 @@ class RoomEditor extends React.Component {
                 })
                 .catch(error => console.error(`There was an error retrieving the room list: ${error}`));
         } else {//creation mode
-            this.setState({room: {}, roomJson: '{}', title: "", description: "", tags:[]});
+            this.setState({room: {}, roomJson: '{}', title: "", description: "", tags:[], uniqueRoom: false});
         }
+        
     }
 
     cancelEdit(){
@@ -56,7 +60,7 @@ class RoomEditor extends React.Component {
 
     handleChange(evt) {
         const target = evt.target;
-        const value = target.value;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
 
         this.setState({
@@ -67,13 +71,14 @@ class RoomEditor extends React.Component {
     save(event) {
         event.preventDefault();
 
-        const {room, title, description, tags} = this.state;
+        const {room, title, description, tags, uniqueRoom} = this.state;
 
         let data = room;
         data.roomJson = event.target.getElementsByClassName("roomJson")[0].value;
         data.title=title;
         data.author_id=1;
         data.description=description;
+        data.uniqueRoom = uniqueRoom;
         data.tags=JSON.stringify(tags);
 
         if(this.props.roomId != null){//update existing room
@@ -118,7 +123,13 @@ class RoomEditor extends React.Component {
     }
 
     render() {
-        const {title, description, tags, roomJson} = this.state;
+        const {title, description, tags, roomJson, uniqueRoom} = this.state;
+
+        let canvas = <div></div>
+        if(roomJson){
+            canvas = (<EditorCanvas roomJson={roomJson}/>);
+        }
+
         return (
             <form onSubmit={this.save}>
             <div className="room-editor">
@@ -130,56 +141,20 @@ class RoomEditor extends React.Component {
                     <button className="close-button button-shadow cancel" onClick={this.cancelEdit}><i className="fa fa-times"/></button>
                 </div>
                 <div className="room-description">
-                    <input name="title" type="text" value={title} onChange={this.handleChange}/>
+                    <input label="Title" name="title" type="text" value={title} onChange={this.handleChange}/>
                     <br/>
-                    <textarea name="description" value={description} onChange={this.handleChange}/>
+                    <textarea label="Description" name="description" value={description} onChange={this.handleChange}/>
                     <ReactTags tags={tags}
                         label="Tags"
                         handleDelete={this.handleDelete}
                         handleAddition={this.handleAddition}
                         handleDrag={this.handleDrag}
                         delimiters={delimiters} />
+                    <br/>
+                    <input label="Unique Room" name="uniqueRoom" type="checkbox" checked={uniqueRoom} onChange={this.handleChange}/>
                 </div>
 
-                <input id='room_json'
-                    className="roomJson"
-                    type="hidden"
-                    value={roomJson} />
-
-                <div className="editor-container">
-                    <div className="editor-image-pane">
-                        <img id="clearTile" src="images/tiles/clear.png" data-layer="TILE" className="clearButton activeTile" alt="clearButton"/>
-                        <img id="floor" src="images/tiles/floor.png" data-layer="TILE" className="tileButton" alt="floor"/>
-                        <img id="floor_2" src="images/tiles/floor_2.png" data-layer="TILE" className="tileButton" alt="floor_2"/>
-                        <img id="floor_3" src="images/tiles/floor_3.png" data-layer="TILE" className="tileButton" alt="floor_3"/>
-                        <img id="floor_4" src="images/tiles/floor_4.png" data-layer="TILE" className="tileButton" alt="floor_4"/>
-                        <img id="wall_w" src="images/tiles/wall_w.png" data-layer="TILE" className="tileButton" alt="wall_w"/>
-                        <img id="wall_s" src="images/tiles/wall_s.png" data-layer="TILE" className="tileButton" alt="wall_s"/>
-                        <img id="wall_e" src="images/tiles/wall_e.png" data-layer="TILE" className="tileButton" alt="wall_e"/>
-                        <img id="wall_n" src="images/tiles/wall_n.png" data-layer="TILE" className="tileButton" alt="wall_n"/>
-                        <img id="wall_nw" src="images/tiles/wall_nw.png" data-layer="TILE" className="tileButton" alt="wall_nw"/>
-                        <img id="wall_ne" src="images/tiles/wall_ne.png" data-layer="TILE" className="tileButton" alt="wall_ne"/>
-                        <img id="wall_sw" src="images/tiles/wall_sw.png" data-layer="TILE" className="tileButton" alt="wall_sw"/>
-                        <img id="wall_se" src="images/tiles/wall_se.png" data-layer="TILE" className="tileButton" alt="wall_se"/>
-                        <img id="wall_c_n_e" src="images/tiles/wall_c_n_e.png" data-layer="TILE" className="tileButton" alt="wall_c_n_e"/>
-                        <img id="wall_c_n_w" src="images/tiles/wall_c_n_w.png" data-layer="TILE" className="tileButton" alt="wall_c_n_w"/>
-                        <img id="wall_c_s_e" src="images/tiles/wall_c_s_e.png" data-layer="TILE" className="tileButton" alt="wall_c_s_e"/>
-                        <img id="wall_c_s_w" src="images/tiles/wall_c_s_w.png" data-layer="TILE" className="tileButton" alt="wall_c_s_w"/>
-                        <img id="wall_e_w" src="images/tiles/wall_e_w.png" data-layer="TILE" className="tileButton" alt="wall_e_w"/>
-                        <img id="wall_n_s" src="images/tiles/wall_n_s.png" data-layer="TILE" className="tileButton" alt="wall_n_s"/>
-                    </div>
-                    <div className="editor-image-pane">
-                        <img id="clearExit" src="images/tiles/clear.png" data-layer="EXIT" className="clearButton" alt="clearExist"/>
-                        <img id="exit_n" src="images/exits/exit_n.png" data-layer="EXIT" className="exitButton" alt="exit_n"/>
-                        <img id="exit_e" src="images/exits/exit_e.png" data-layer="EXIT" className="exitButton" alt="exit_e"/>
-                        <img id="exit_s" src="images/exits/exit_s.png" data-layer="EXIT" className="exitButton" alt="exit_s"/>
-                        <img id="exit_w" src="images/exits/exit_w.png" data-layer="EXIT" className="exitButton" alt="exit_w"/>
-                    </div>
-                    <div className="editor-canvas-container">
-                        <canvas id="tileEditor" width="1400px" height="1400px">
-                        </canvas>
-                    </div>
-                </div>
+                {canvas}
             </div>
             </form>
         );

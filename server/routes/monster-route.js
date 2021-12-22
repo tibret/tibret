@@ -1,26 +1,26 @@
 // Import express
-const express = require('express')
+import { Router } from 'express'
 
 // Import monster-controller
-const monsterRoutes = require('./../controllers/monster-controller.js')
+import { monsterAll, monsterCreate, monsterDelete } from './../controllers/monster-controller.js'
 
 // Create router
-const router = express.Router()
+const router = Router()
 
 // Add route for GET request to retrieve all monster
 // In server.js, monsters route is specified as '/monsters'
 // this means that '/all' translates to '/monsters/all'
-router.get('/all', monsterRoutes.monsterAll)
+router.get('/all', monsterAll)
 
 // Add route for POST request to create new monster
 // In server.js, monsters route is specified as '/monsters'
 // this means that '/create' translates to '/monsters/create'
-router.post('/create', monsterRoutes.monsterCreate)
+router.post('/create', monsterCreate)
 
 // Add route for PUT request to delete specific monster
 // In server.js, monsters route is specified as '/monsters'
 // this means that '/delete' translates to '/monsters/delete'
-router.put('/delete', monsterRoutes.monsterDelete)
+router.put('/delete', monsterDelete)
 
 // Export router
-module.exports = router
+export default router

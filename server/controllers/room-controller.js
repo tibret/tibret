@@ -1,8 +1,8 @@
 // Import database
-const knex = require('./../db')
+import knex from '../db.cjs';
 
 // Retrieve all rooms
-exports.roomAll = async (req, res) => {
+export async function roomAll(req, res){
   // Get all rooms from database
   knex
     .select('*') // select all records
@@ -18,7 +18,7 @@ exports.roomAll = async (req, res) => {
 }
 
 // Retrieve one room
-exports.roomGet = async (req, res) => {
+export async function roomGet(req, res){
     let roomId = req.params.roomId;
   // Get all rooms from database
   knex
@@ -26,6 +26,9 @@ exports.roomGet = async (req, res) => {
     .from('room') // from 'room' table
     .where('id', roomId)
     .then(userData => {
+      //edit the data to transform booleans to acatual boolean values
+      userData[0].uniqueRoom = (userData[0].uniqueRoom == 1 ? true : false);
+      
       // Send rooms extracted from database in response
       res.json(userData)
     })
@@ -36,8 +39,8 @@ exports.roomGet = async (req, res) => {
 }
 
 // Create new room
-exports.roomUpdate = async (req, res) => {
-    console.log(req.body.roomJson)
+export async function roomUpdate(req, res){
+    console.log(req.body.uniqueRoom)
   // Add new room to database
   knex('room')
     .where("id", req.body.id)
@@ -47,6 +50,7 @@ exports.roomUpdate = async (req, res) => {
         'title': req.body.title,
         'description': req.body.description,
         'roomJson': req.body.roomJson,
+        'uniqueRoom': req.body.uniqueRoom ? 1 : 0,
         'tags': req.body.tags
     })
     .then(() => {
@@ -55,12 +59,12 @@ exports.roomUpdate = async (req, res) => {
     })
     .catch(err => {
       // Send a error message in response
-      res.json({ message: `There was an error creating ${req.body.title} room: ${err}` })
+      res.json({ message: `There was an error updating ${req.body.title} room: ${err}` })
     })
 }
 
 // Create new room
-exports.roomCreate = async (req, res) => {
+export async function roomCreate(req, res){
   // Add new room to database
   knex('room')
     .insert({ // insert new record, a room
@@ -69,6 +73,7 @@ exports.roomCreate = async (req, res) => {
         'title': req.body.title,
         'description': req.body.description,
         'roomJson': req.body.roomJson,
+        'uniqueRoom': req.body.uniqueRoom ? 1 : 0,
         'tags': req.body.tags
     })
     .then(() => {
@@ -82,7 +87,7 @@ exports.roomCreate = async (req, res) => {
 }
 
 // Remove specific room
-exports.roomDelete = async (req, res) => {
+export async function roomDelete(req, res) {
   // Find specific room in the database and remove it
   knex('room')
     .where('id', req.body.id) // find correct record based on id

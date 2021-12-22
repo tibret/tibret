@@ -1,11 +1,10 @@
 // Import database
-const knex = require('./../db')
+import knex from '../db.cjs'
 
 // Retrieve all monsters
-exports.monsterAll = async (req, res) => {
+export async function monsterAll(req, res) {
   // Get all monsters from database
-  knex
-    .select('*') // select all records
+  knex('monster').select('*') // select all records
     .from('monster') // from 'monster' table
     .then(userData => {
       // Send monsters extracted from database in response
@@ -18,7 +17,7 @@ exports.monsterAll = async (req, res) => {
 }
 
 // Create new monster
-exports.monsterCreate = async (req, res) => {
+export async function monsterCreate(req, res) {
   // Add new monster to database
   knex('monster')
     .insert({ // insert new record, a monster
@@ -38,7 +37,7 @@ exports.monsterCreate = async (req, res) => {
 }
 
 // Remove specific monster
-exports.monsterDelete = async (req, res) => {
+export async function monsterDelete(req, res) {
   // Find specific monster in the database and remove it
   knex('monster')
     .where('id', req.body.id) // find correct record based on id

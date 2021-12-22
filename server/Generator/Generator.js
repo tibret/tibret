@@ -1,5 +1,5 @@
-var Jimp = require('jimp');
-var fs = require('fs')
+import Jimp from 'jimp'
+import fs from 'fs'
 
 class Tile{
     position = [0,0];
@@ -103,7 +103,7 @@ class Room{
     }
 }
 
-module.exports = class Map{
+class Map{
     rooms = [];
     constructor(){
         this.rooms = [];
@@ -192,10 +192,10 @@ module.exports = class Map{
     }
 
     async toImage(){
-        let minX = 0
-        let minY = 0
-        let maxX = 0
-        let maxY = 0
+        let minX = 0;
+        let minY = 0;
+        let maxX = 0;
+        let maxY = 0;
 
         for(let room of this.rooms){
             if(room.position[0] < minX){
@@ -236,7 +236,7 @@ module.exports = class Map{
         let promises = [];
         for (let room of this.rooms){
             for (let tile of room.tiles){
-                let file = fs.readFileSync("./public/images/tiles/" + tile.sprite+".png");
+                let file = fs.readFileSync("./public/images/default/" + tile.sprite+".png");
                 const sprite = await Jimp.read(file);
                 // console.log("Adding sprite "+ tile.sprite + " with rotation "+ room.rotation);
                 await sprite.rotate(room.rotation);
@@ -260,3 +260,5 @@ function facingMatches(exit1, exit2) {
 
     return false;
 }
+
+export default Map;

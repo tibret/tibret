@@ -262,5 +262,3 @@ function deserializeDungeon(){
         placedExits[exitJson.x][exitJson.y] = document.getElementById(exitJson.exitSprite);
     }
 }
-
-domloaded();
