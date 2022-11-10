@@ -11,6 +11,10 @@ import roomRouter from './routes/room-route.js'
 import generatorRouter from './routes/generator-route.js'
 import paletteRouter from './routes/palette-route.js'
 
+//import db
+import { initDB } from "./db.js";
+initDB();
+
 // Set default port for express app
 const PORT = process.env.PORT || 4001
 

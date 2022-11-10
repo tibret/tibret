@@ -40,7 +40,7 @@ class DungeonGenerator extends React.Component {
             .get('http://localhost:4001/rooms/all')
             .then(response => {
                 this.setState({roomsJson : response.data, dataIsLoaded: true});
-
+                
                 let sug = [];
                 let sugText = [];
                 for(let room of this.state.roomsJson){

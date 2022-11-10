@@ -1,7 +1,7 @@
 // Import database
 import Map from '../Generator/Generator.js';
 import Jimp from 'jimp';
-import knex from '../db.cjs';
+import db from '../db.js';
 
 
 // Retrieve all monsters
@@ -59,7 +59,7 @@ export async function generate(req, res) {
         }
 
         try{
-            map.insertRoom(roomDef);
+            map.insertRoom(room);
             // console.log("Current Number of Rooms: " + map.rooms.length);
             if(room.uniqueRoom){
                 console.log("Rooms before " + rooms.length);
@@ -87,27 +87,19 @@ export async function generate(req, res) {
 // Retrieve all monsters
 export async function printRoom(req, res) {
     let roomId = req.params.roomId;
-    // Get all rooms from database
-    knex
-      .select('*') // select all records
-      .from('room') // from 'room' table
-      .where('id', roomId)
-      .then(userData => {
-        let roomDef = JSON.parse(userData[0].roomJson);
+    console.log(roomId);
+    let userData = await db.select(roomId);
+    console.log(userData);
+    let roomDef = JSON.parse(userData[0].roomJson);
 
-        let map = new Map();
-        map.insertRoom(roomDef);
+    let map = new Map();
+    map.insertRoom(userData[0]);
     
-        //stitch the image together from tiles
-        map.toImage().then(img => {
-            //put it in the response
-            img.getBase64Async(Jimp.MIME_PNG).then(image => {
-                res.json({img: image});
-            });
+    //stitch the image together from tiles
+    map.toImage().then(img => {
+        //put it in the response
+        img.getBase64Async(Jimp.MIME_PNG).then(image => {
+            res.json({img: image});
         });
-      })
-      .catch(err => {
-        // Send a error message in response
-        res.json({ message: `There was an error retrieving rooms: ${err}` })
-      })
+    });
 }

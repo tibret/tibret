@@ -45,8 +45,8 @@ class Rooms extends React.Component {
         return (
             <div className="Rooms rooms-wrapper">
                 <h1>All Rooms
-                    <button className="circle-button affirmative" onClick={this.props.newRoomCallback}><i className="fa fa-plus"/></button>
-                    <button className="circle-button affirmative" onClick={this.props.generateDungeonCallback}><i className="fa fa-map-marker"/></button>
+                    <button className="circle-button affirmative mar-left-10" onClick={this.props.newRoomCallback}><i className="fa fa-plus"/></button>
+                    <button className="circle-button affirmative mar-left-10" onClick={this.props.generateDungeonCallback}><i className="fa fa-map-marker"/></button>
                 </h1>
                 {roomsJson.map((rm, idx) => <Room {...rm} key={rm.id} editRoomCallback={this.props.editRoomCallback} deleteRoomCallback={this.deleteRoomCallback}/>)}
                 <div id="img-container">

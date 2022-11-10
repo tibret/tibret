@@ -1,3 +1,25 @@
+import Surreal from "surrealdb.js";
+
+const db = new Surreal('http://127.0.0.1:8000/rpc');
+
+export async function initDB() {
+	try {
+		// Signin as a namespace, database, or root user
+		await db.signin({
+			user: 'root',
+			pass: 'root',
+		});
+
+		// Select a specific namespace / database
+		await db.use('test', 'test');
+	} catch (e) {
+		console.error('ERROR', e);
+	}
+}
+
+export default db
+
+/*
 // Import path module
 const path = require('path')
 
@@ -142,3 +164,4 @@ knex.schema
 
 // Export the database
 module.exports = knex
+*/

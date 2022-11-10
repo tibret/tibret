@@ -140,10 +140,14 @@ class RoomEditor extends React.Component {
                     <button className="circle-button affirmative button-shadow" type="submit"><i className="fa fa-save"/></button>
                     <button className="close-button button-shadow cancel" onClick={this.cancelEdit}><i className="fa fa-times"/></button>
                 </div>
-                <div className="room-description">
+                <div className="room-description" >
+                    <div className='label'>Title</div>
                     <input label="Title" name="title" type="text" value={title} onChange={this.handleChange}/>
-                    <br/>
+                    
+                    <div className='label'>Description</div>
                     <textarea label="Description" name="description" value={description} onChange={this.handleChange}/>
+                    
+                    <div className='label'>Tags</div>
                     <ReactTags tags={tags}
                         label="Tags"
                         handleDelete={this.handleDelete}
@@ -151,6 +155,8 @@ class RoomEditor extends React.Component {
                         handleDrag={this.handleDrag}
                         delimiters={delimiters} />
                     <br/>
+
+                    <div className='label'>Unique?</div>
                     <input label="Unique Room" name="uniqueRoom" type="checkbox" checked={uniqueRoom} onChange={this.handleChange}/>
                 </div>
 

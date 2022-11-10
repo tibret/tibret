@@ -67,19 +67,26 @@ class Room{
     position = [0, 0];
     name = "";
     flavorText = "";
-
+    number=0;
+    unique = false;
     // the degrees that the room has been rotated by
     rotation = 0;
 
     constructor(params){
+        let roomDef = JSON.parse(params.roomJson);
+        this.name = params.title;
+        this.flavorText = params.description;
+        this.number=params.id;
+        this.unique = params.uniqueRoom == 1;
+
         this.tiles = [];
-        for(let tileJson of params.tiles){
+        for(let tileJson of roomDef.tiles){
             let tile = new Tile(tileJson);
             this.tiles.push(tile);
         }
 
         this.exits = [];
-        for(let exitJson of params.exits){
+        for(let exitJson of roomDef.exits){
             let exit = new Exit(exitJson);
             this.exits.push(exit);
         }
@@ -100,6 +107,42 @@ class Room{
         }
 
         this.rotation = (this.rotation + 90) % 360
+    }
+
+    sizeX(){
+        let minx = 0;
+        let maxx = 0;
+        for(let tile of this.tiles){
+            let x = tile.position[0];
+            if(x < minx){
+                minx = x;
+            }
+            if(x > maxx){
+                maxx = x;
+            }
+        }
+
+        return maxx-minx;
+    }
+
+    sizeY(){
+        let miny = 0;
+        let maxy = 0;
+        for(let tile of this.tiles){
+            let x = tile.position[0];
+            if(x < miny){
+                miny = x;
+            }
+            if(x > maxy){
+                maxy = x;
+            }
+        }
+
+        return maxy-miny;
+    }
+
+    labelOffset(){
+        return [this.position[0] + this.sizeX()/2, this.position[1] + this.sizeY()/2];
     }
 }
 
@@ -229,9 +272,15 @@ class Map{
             }
         }
 
-        let image = new Jimp(maxX - minX + 70, maxY - minY + 70, 'white', (err, image) => {
+        let image = new Jimp(maxX - minX + 70 + 400, maxY - minY + 70, 'white', (err, image) => {
             if (err) throw err
         });
+
+        let infoX = maxX - minX + 70;
+        let infoY = 0;
+
+        const infoFont = await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
+        const labelFont = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
 
         let promises = [];
         for (let room of this.rooms){
@@ -241,6 +290,19 @@ class Map{
                 // console.log("Adding sprite "+ tile.sprite + " with rotation "+ room.rotation);
                 await sprite.rotate(room.rotation);
                 await image.composite(sprite, room.position[0] + tile.position[0] - minX, room.position[1] + tile.position[1] - minY);
+            }
+
+            if(room.unique){
+                //print the label
+                let labelOffset = room.labelOffset();
+                await image.print(labelFont, labelOffset[0] - minX, labelOffset[1] - minY, room.number);
+
+                //print the description
+                await image.print(infoFont, infoX, infoY, room.number + " - " + room.name, 390);
+                infoY += Jimp.measureTextHeight(infoFont, room.number + " - " + room.name, 390); // move y-value of the info;
+                await image.print(infoFont, infoX, infoY, room.flavorText, 390);
+                infoY += Jimp.measureTextHeight(infoFont, room.flavorText, 390); // move y-value of the info;
+                infoY += 30;
             }
         }
 

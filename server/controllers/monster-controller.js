@@ -1,5 +1,5 @@
 // Import database
-import knex from '../db.cjs'
+import db from '../db.js'
 
 // Retrieve all monsters
 export async function monsterAll(req, res) {

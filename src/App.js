@@ -3,6 +3,7 @@ import Rooms from './Rooms';
 import RoomEditor from './RoomEditor';
 import DungeonGenerator from './DungeonGenerator';
 import React from 'react';
+import Loading from './Loading';
 import {Helmet} from "react-helmet";
 
 class App extends React.Component {

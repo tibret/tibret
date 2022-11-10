@@ -1,4 +1,62 @@
 // Import database
+import db from '../db.js';
+
+// Retrieve all rooms
+export async function roomAll(req, res){
+  // Get all rooms from database
+  let rooms = await db.select("room");
+  res.json(rooms);
+}
+
+// Retrieve one room
+export async function roomGet(req, res){
+    let room = await db.select(req.params.roomId);
+    res.json(room);
+}
+
+// Create new room
+export async function roomUpdate(req, res){
+  let data = { // insert new record, a room
+    'author_id': req.body.author_id,
+    'title': req.body.title,
+    'description': req.body.description,
+    'roomJson': req.body.roomJson,
+    'uniqueRoom': req.body.uniqueRoom ? 1 : 0,
+    'tags': req.body.tags
+  };
+
+  console.log(`Updating ${req.body.id} with data ${data}`);
+
+  let room = db.change(req.body.id, data);
+
+  res.json({ message: `room \'${req.body.title}\' by ${req.body.author} updated.` })
+}
+
+// Create new room
+export async function roomCreate(req, res){
+  let data = { // insert new record, a room
+    'created': new Date(),
+    'author_id': req.body.author_id,
+    'title': req.body.title,
+    'description': req.body.description,
+    'roomJson': req.body.roomJson,
+    'uniqueRoom': req.body.uniqueRoom ? 1 : 0,
+    'tags': req.body.tags
+  };
+
+  let room = await db.create('room', data);
+
+  res.json({ message: `room \'${req.body.title}\' by ${req.body.author} created.` })
+}
+
+// Remove specific room
+export async function roomDelete(req, res) {
+  await db.delete(req.body.id);
+  res.json({ message: `room ${req.body.id} deleted.` });
+}
+
+/*
+// Import database
 import knex from '../db.cjs';
 
 // Retrieve all rooms
@@ -101,3 +159,4 @@ export async function roomDelete(req, res) {
       res.json({ message: `There was an error deleting ${req.body.id} room: ${err}` })
     })
 }
+*/

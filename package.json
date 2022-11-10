@@ -24,12 +24,14 @@
     "react-scripts": "4.0.3",
     "react-tag-input": "^6.7.3",
     "sqlite3": "^5.0.2",
+    "surrealdb.js": "^0.5.0",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
+    "start-db": "C:\\Users\\robbie\\SurrealDB\\surreal.exe start --log debug --user root --pass root file://db/test.db",
     "start-server": "nodemon server/server.js --watch server/*",
     "start-front": "react-scripts start",
-    "start": "concurrently \"npm run start-server\" \"npm run start-front\" --kill-others --kill-others-on-fail",
+    "start": "concurrently \"npm run start-db\" \"npm run start-server\" \"npm run start-front\" --kill-others --kill-others-on-fail",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
